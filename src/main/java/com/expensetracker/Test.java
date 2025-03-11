@@ -1,4 +1,4 @@
-package main.java.com.expensetracker;
+package com.expensetracker;
 public class Test {
     public static void main(String[] args) {
         DatabaseManager db = new DatabaseManager("database.csv");
