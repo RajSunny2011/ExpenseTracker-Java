@@ -28,16 +28,22 @@ public class DatabaseManager {
         }
     }
     public void viewAllTransactions() {
-        System.out.println("Transaction ID   Transaction Date   Transaction Type   Transaction Category   Transaction Amount   Transaction Description");
-        System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
+        System.out.format("%-20s%-20s%-20s%-20s%-20s%-20s%n", "Transaction ID", "Date", "Type", "Category", "Amount", "Description");
         final Object[][] table = new String[100][]; 
         int rowIndex = 0;
+        double transactionTotal = 0;
     
         try (Scanner scanner = new Scanner(obj);) {
             while (scanner.hasNextLine()) {
                 String transaction = scanner.nextLine();
                 // Split the transaction line by commas
                 String[] transactionData = transaction.split(",");
+
+                if (transactionData[2].equals("Income")) {
+                    transactionTotal += Double.parseDouble(transactionData[4]);
+                } else {
+                    transactionTotal -= Double.parseDouble(transactionData[4]);
+                }
     
                 // Add this transaction to the table array
                 table[rowIndex] = transactionData;
@@ -52,6 +58,7 @@ public class DatabaseManager {
             Object[] row = table[i];
             System.out.format("%-20s%-20s%-20s%-20s%-20s%-20s%n", row);
         }
+        System.out.println("Total: " + transactionTotal);
     }
     
 }
