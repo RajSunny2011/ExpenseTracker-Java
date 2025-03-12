@@ -9,17 +9,30 @@ public class DatabaseManager {
     File obj;
     public DatabaseManager(String databasePath) {
         this.obj = new File(databasePath);
-        if (!obj.exists()) {
-            System.out.println("Database file does not exist. Creating a new database file.");
-            try {
-                obj.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException("Error creating database file.");
+    }
+
+    public boolean isDatabaseEmpty() {
+        return obj.length() == 0;
+    }
+
+    // returns the last transaction id
+    public int openDatabase() {
+        if (isDatabaseEmpty()) {
+            return -1;
+        }
+        try (Scanner scanner = new Scanner(obj);) {
+            int lastTransactionId = 0;
+            while (scanner.hasNextLine()) {
+                String transaction = scanner.nextLine();
+                String[] transactionData = transaction.split(",");
+                lastTransactionId = Integer.parseInt(transactionData[0]);
             }
-        } else {
-            System.out.println("Database file exists.");
+            return lastTransactionId;
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading from database file.");
         }
     }
+
     public void addTransaction(Transaction transaction) {
         try (FileWriter writer = new FileWriter(obj, true)) {
             writer.write(transaction.getTransactionId() + "," + transaction.getTransactionDate() + "," + transaction.getTransactionType() + "," + transaction.getTransactionCategory() + "," + transaction.getTransactionAmount() + "," + transaction.getTransactionDescription() + "\n");
@@ -27,6 +40,7 @@ public class DatabaseManager {
             throw new RuntimeException("Error writing to database file.");
         }
     }
+    
     public void viewAllTransactions() {
         System.out.format("%-20s%-20s%-20s%-20s%-20s%-20s%n", "Transaction ID", "Date", "Type", "Category", "Amount", "Description");
         final Object[][] table = new String[100][]; 
