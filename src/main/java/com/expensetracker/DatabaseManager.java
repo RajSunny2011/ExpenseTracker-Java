@@ -9,17 +9,30 @@ public class DatabaseManager {
     File obj;
     public DatabaseManager(String databasePath) {
         this.obj = new File(databasePath);
-        if (!obj.exists()) {
-            System.out.println("Database file does not exist. Creating a new database file.");
-            try {
-                obj.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException("Error creating database file.");
+    }
+
+    public boolean isDatabaseEmpty() {
+        return obj.length() == 0;
+    }
+
+    // returns the last transaction id
+    public int openDatabase() {
+        if (isDatabaseEmpty()) {
+            return -1;
+        }
+        try (Scanner scanner = new Scanner(obj);) {
+            int lastTransactionId = 0;
+            while (scanner.hasNextLine()) {
+                String transaction = scanner.nextLine();
+                String[] transactionData = transaction.split(",");
+                lastTransactionId = Integer.parseInt(transactionData[0]);
             }
-        } else {
-            System.out.println("Database file exists.");
+            return lastTransactionId;
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading from database file.");
         }
     }
+
     public void addTransaction(Transaction transaction) {
         try (FileWriter writer = new FileWriter(obj, true)) {
             writer.write(transaction.getTransactionId() + "," + transaction.getTransactionDate() + "," + transaction.getTransactionType() + "," + transaction.getTransactionCategory() + "," + transaction.getTransactionAmount() + "," + transaction.getTransactionDescription() + "\n");
@@ -27,17 +40,24 @@ public class DatabaseManager {
             throw new RuntimeException("Error writing to database file.");
         }
     }
+    
     public void viewAllTransactions() {
-        System.out.println("Transaction ID   Transaction Date   Transaction Type   Transaction Category   Transaction Amount   Transaction Description");
-        System.out.println("-----------------------------------------------------------------------------------------------------------------------------");
+        System.out.format("%-20s%-20s%-20s%-20s%-20s%-20s%n", "Transaction ID", "Date", "Type", "Category", "Amount", "Description");
         final Object[][] table = new String[100][]; 
         int rowIndex = 0;
+        double transactionTotal = 0;
     
         try (Scanner scanner = new Scanner(obj);) {
             while (scanner.hasNextLine()) {
                 String transaction = scanner.nextLine();
                 // Split the transaction line by commas
                 String[] transactionData = transaction.split(",");
+
+                if (transactionData[2].equals("Income")) {
+                    transactionTotal += Double.parseDouble(transactionData[4]);
+                } else {
+                    transactionTotal -= Double.parseDouble(transactionData[4]);
+                }
     
                 // Add this transaction to the table array
                 table[rowIndex] = transactionData;
@@ -52,6 +72,7 @@ public class DatabaseManager {
             Object[] row = table[i];
             System.out.format("%-20s%-20s%-20s%-20s%-20s%-20s%n", row);
         }
+        System.out.println("Total: " + transactionTotal);
     }
     
 

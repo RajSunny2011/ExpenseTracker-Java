@@ -19,6 +19,18 @@ public class Transaction {
         transactionCount++;
     }
 
+    // to be used when there alred exists transactions in the database
+    public Transaction(int lastTransactionId, String transactionDate, String transactionType, String transactionCategory, double transactionAmount, String transactionDescription) {
+        this.transactionId = ++lastTransactionId + "";
+        transactionCount = lastTransactionId;
+        this.transactionDate = transactionDate;
+        this.transactionType = transactionType;
+        this.transactionCategory = transactionCategory;
+        this.transactionAmount = transactionAmount;
+        this.transactionDescription = transactionDescription;
+        transactionCount++;
+    }
+
     public String getTransactionId() {
         return transactionId;
     }
