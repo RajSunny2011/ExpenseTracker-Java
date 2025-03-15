@@ -54,4 +54,29 @@ public class DatabaseManager {
         }
     }
     
+
+public void viewRecentTransactions() {
+    final Object[][] table = new String[100][]; 
+    int rowIndex = 0;
+
+    try (Scanner scanner = new Scanner(obj);) {
+        while (scanner.hasNextLine()) {
+            String transaction = scanner.nextLine();
+            // Split the transaction line by commas
+            String[] transactionData = transaction.split(",");
+
+            // Add this transaction to the table array
+            String[] data = {transactionData[5], transactionData[3], transactionData[2], transactionData[4]};
+            table[rowIndex] = data;
+            rowIndex++;
+        }
+    } catch (IOException e) {
+        throw new RuntimeException("Error reading from database file.");
+    }
+
+    // Print the table with formatted output
+   for(int i=rowIndex-1; i>=0;i--) {
+    Object[] row= table[i];
+    System.out.format("%-30a%-20s%-10s%-10s%n",row);
 }
+}}
