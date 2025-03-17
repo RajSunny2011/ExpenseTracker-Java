@@ -76,28 +76,77 @@ public class DatabaseManager {
     }
     
 
-public void viewRecentTransactions() {
-    final Object[][] table = new String[100][]; 
-    int rowIndex = 0;
-
-    try (Scanner scanner = new Scanner(obj);) {
-        while (scanner.hasNextLine()) {
-            String transaction = scanner.nextLine();
-            // Split the transaction line by commas
-            String[] transactionData = transaction.split(",");
-
-            // Add this transaction to the table array
-            String[] data = {transactionData[5], transactionData[3], transactionData[2], transactionData[4]};
-            table[rowIndex] = data;
-            rowIndex++;
+    public void viewRecentTransactions() {
+        Transaction[][] groupedTransactions = new Transaction[100][50]; // Maxi 100 datess and max 50 transactions per date
+        String[] uniqueDates = new String[100]; // Store unique dates
+        int[] transactionCounts = new int[100]; // for number of transactions per date
+        int dateCount =0;
+    
+        try (Scanner scanner = new Scanner(this.obj)) { // doingbthis allows auto close
+            while (scanner.hasNextLine()) {
+                String[] transactionData = scanner.nextLine().split(",");
+                String date = transactionData[1];
+    
+                // Convert data into Transaction object
+                Transaction transaction = new Transaction(
+                    Integer.parseInt(transactionData[0]), // Transaction ID
+                    transactionData[1],                   // Date
+                    transactionData[2],                   // Type (Income/Expense)
+                    transactionData[3],                   // Category
+                    Double.parseDouble(transactionData[4]), // Amount
+                    transactionData[5]                    // Description
+                );
+    
+                // Find existing date group or create new one
+                int dateIndex = -1;
+                for (int i = 0; i < dateCount; i++) {
+                    if (uniqueDates[i].equals(date)) {
+                        dateIndex = i;
+                        break;
+                    }
+                }
+    
+                if (dateIndex == -1) {
+                    dateIndex = dateCount;
+                    uniqueDates[dateCount] = date;
+                    transactionCounts[dateCount] = 0;
+                    dateCount++;
+                }
+    
+                // Add transaction to the correct date group
+                int transIndex = transactionCounts[dateIndex];
+                groupedTransactions[dateIndex][transIndex] = transaction;
+                transactionCounts[dateIndex]++;
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Error reading from database file.");
         }
-    } catch (IOException e) {
-        throw new RuntimeException("Error reading from database file.");
+    
+        // Print transactions grouped by date (descending order)
+        for (int i = dateCount - 1; i >= 0; i--) {
+            String date = uniqueDates[i];
+            double dailyTotal = 0;
+    
+            // Calculate daily total
+            for (int j = 0; j < transactionCounts[i]; j++) {
+                Transaction transaction = groupedTransactions[i][j];
+                if (transaction.getTransactionType().equals("Income")) {
+                    dailyTotal += transaction.getTransactionAmount();
+                } else {
+                    dailyTotal -= transaction.getTransactionAmount();
+                }
+            }
+    
+            // Print Date and Daily Total
+            System.out.println(date + "  " + (dailyTotal >= 0 ? dailyTotal : "-" + Math.abs(dailyTotal)));
+    
+            // Print transactions for this date
+            for (int j = 0; j < transactionCounts[i]; j++) {
+                Transaction transaction = groupedTransactions[i][j];
+                String typeIcon = transaction.getTransactionType().equals("Income") ? "+" : "-";
+                System.out.printf("%s  %-15s %-10s%n", typeIcon, transaction.getTransactionCategory(), transaction.getTransactionAmount());
+            }
+            System.out.println();
+        }
     }
-
-    // Print the table with formatted output
-   for(int i=rowIndex-1; i>=0;i--) {
-    Object[] row= table[i];
-    System.out.format("%-30a%-20s%-10s%-10s%n",row);
 }
-}}
