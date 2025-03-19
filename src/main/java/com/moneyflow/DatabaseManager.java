@@ -1,4 +1,4 @@
-package com.expensetracker;
+package com.moneyflow;
 
 import java.io.File;
 import java.io.FileWriter;

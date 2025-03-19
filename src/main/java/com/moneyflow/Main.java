@@ -1,4 +1,4 @@
-package com.expensetracker;
+package com.moneyflow;
 import java.util.Scanner;
 
 public class Main {

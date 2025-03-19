@@ -1,4 +1,4 @@
-package com.expensetracker;
+package com.moneyflow;
 
 public class Transaction {
     static int transactionCount = 0;

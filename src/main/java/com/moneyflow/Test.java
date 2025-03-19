@@ -1,4 +1,4 @@
-package com.expensetracker;
+package com.moneyflow;
 
 public class Test {
     public static void main(String[] args) {
