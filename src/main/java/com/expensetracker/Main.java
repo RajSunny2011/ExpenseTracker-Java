@@ -40,9 +40,13 @@ public class Main {
                     scanner.nextLine();
                     System.out.print("Enter transaction description: ");
                     String description = scanner.nextLine();
-                    Transaction transaction = new Transaction(date, type, category, amount, description);
-
-                    // Add the transaction to the database
+                    Transaction transaction;
+                    if (dbManager.isDatabaseEmpty()){
+                        transaction = new Transaction(date, type, category, amount, description);
+                    } else {
+                        int lastTransactionId = dbManager.openDatabase();
+                        transaction = new Transaction(lastTransactionId, date, type, category, amount, description);
+                    }
                     dbManager.addTransaction(transaction);
                     System.out.println("Transaction added successfully!");
                 }
