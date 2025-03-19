@@ -79,4 +79,11 @@ public class Transaction {
         this.transactionDescription = transactionDescription;
     }
 
+    public String getTransactionData(){
+        return this.transactionId + "," + this.transactionDate + "," + this.transactionType + "," + this.transactionCategory + "," + this.transactionAmount + "," + this.transactionDescription + "\n";
+    }
+
+    public String getFormatedTransactionData(){
+        return String.format("%-5s %-10s %-20s", this.transactionType, this.transactionCategory, this.transactionAmount);
+    }
 }

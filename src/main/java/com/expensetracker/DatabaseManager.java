@@ -35,7 +35,7 @@ public class DatabaseManager {
 
     public void addTransaction(Transaction transaction) {
         try (FileWriter writer = new FileWriter(obj, true)) {
-            writer.write(transaction.getTransactionId() + "," + transaction.getTransactionDate() + "," + transaction.getTransactionType() + "," + transaction.getTransactionCategory() + "," + transaction.getTransactionAmount() + "," + transaction.getTransactionDescription() + "\n");
+            writer.write(transaction.getTransactionData());
         } catch (IOException e) {
             throw new RuntimeException("Error writing to database file.");
         }
@@ -143,8 +143,8 @@ public class DatabaseManager {
             // Print transactions for this date
             for (int j = 0; j < transactionCounts[i]; j++) {
                 Transaction transaction = groupedTransactions[i][j];
-                String typeIcon = transaction.getTransactionType().equals("Income") ? "+" : "-";
-                System.out.printf("%s  %-15s %-10s%n", typeIcon, transaction.getTransactionCategory(), transaction.getTransactionAmount());
+                // String typeIcon = transaction.getTransactionType().equals("Income") ? "+" : "-";
+                System.out.println(transaction.getFormatedTransactionData());
             }
             System.out.println();
         }
